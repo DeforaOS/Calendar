@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2011 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2011-2012 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Accessories */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+/* TODO:
+ * - complete iCal support */
 
 
 
@@ -23,6 +25,7 @@
 #include <errno.h>
 #include <gtk/gtk.h>
 #include <System.h>
+#include "calendar.h"
 #include "../config.h"
 
 /* macros */
@@ -34,7 +37,7 @@
 /* Calendar */
 /* private */
 /* types */
-typedef struct _Calendar
+struct _Calendar
 {
 	struct tm today;
 	Config * config;
@@ -42,7 +45,7 @@ typedef struct _Calendar
 	/* widgets */
 	GtkWidget * window;
 	GtkWidget * widget;
-} Calendar;
+};
 
 typedef struct _CalendarEvent
 {
@@ -59,8 +62,6 @@ typedef struct _CalendarEvent
 
 
 /* prototypes */
-static Calendar * _calendar_new(void);
-static void _calendar_delete(Calendar * calendar);
 /* accessors */
 static char const * _calendar_get_detail(Calendar * calendar, unsigned int year,
 		unsigned int month, unsigned int day);
@@ -86,6 +87,7 @@ static int _calendar_event_set_start(CalendarEvent * event, time_t start);
 static char * _config_get_filename(void);
 
 
+/* public */
 /* functions */
 /* calendar_new */
 static void _new_config(Calendar * calendar);
@@ -99,7 +101,7 @@ static void _calendar_on_open(gpointer data);
 #endif
 static void _calendar_on_edit(gpointer data);
 
-static Calendar * _calendar_new(void)
+Calendar * calendar_new(void)
 {
 	Calendar * calendar;
 	time_t now;
@@ -115,7 +117,7 @@ static Calendar * _calendar_new(void)
 	calendar->config = NULL;
 	if((now = time(NULL)) == -1)
 	{
-		_calendar_delete(calendar);
+		calendar_delete(calendar);
 		_calendar_error(NULL, NULL, 1);
 		return NULL;
 	}
@@ -322,7 +324,7 @@ static void _calendar_on_edit(gpointer data)
 
 
 /* calendar_delete */
-static void _calendar_delete(Calendar * calendar)
+void calendar_delete(Calendar * calendar)
 {
 	if(calendar->config != NULL)
 		config_delete(calendar->config);
@@ -330,6 +332,8 @@ static void _calendar_delete(Calendar * calendar)
 }
 
 
+/* private */
+/* functions */
 /* accessors */
 /* calendar_get_detail */
 static char const * _calendar_get_detail(Calendar * calendar, unsigned int year,
@@ -746,32 +750,4 @@ static char * _config_get_filename(void)
 		return NULL;
 	snprintf(filename, len, "%s/%s", homedir, CALENDAR_CONFIG_FILE);
 	return filename;
-}
-
-
-/* usage */
-static int _usage(void)
-{
-	fputs("Usage: calendar\n", stderr);
-	return 1;
-}
-
-
-/* main */
-int main(int argc, char * argv[])
-{
-	int o;
-	Calendar * calendar;
-
-	gtk_init(&argc, &argv);
-	while((o = getopt(argc, argv, "")) != -1)
-		switch(o)
-		{
-			default:
-				return _usage();
-		}
-	calendar = _calendar_new();
-	gtk_main();
-	_calendar_delete(calendar);
-	return 0;
 }

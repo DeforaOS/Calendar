@@ -48,7 +48,7 @@ static GtkWidget * _calendar_get_widget(Calendar * calendar);
 MailerPluginDefinition plugin =
 {
 	"Calendar",
-	NULL,
+	"stock_calendar",
 	NULL,
 	_calendar_init,
 	_calendar_destroy,

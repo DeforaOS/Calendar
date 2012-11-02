@@ -125,6 +125,10 @@ Calendar * calendar_new(void)
 	_new_config(calendar);
 	/* window */
 	calendar->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+#if GTK_CHECK_VERSION(2, 6, 0)
+	gtk_window_set_icon_name(GTK_WINDOW(calendar->window),
+			"stock_calendar");
+#endif
 	gtk_window_set_title(GTK_WINDOW(calendar->window), "Calendar");
 	g_signal_connect_swapped(G_OBJECT(calendar->window), "delete-event",
 			G_CALLBACK(_calendar_on_closex), calendar);

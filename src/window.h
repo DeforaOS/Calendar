@@ -15,54 +15,18 @@
 
 
 
-#include <unistd.h>
-#include <stdio.h>
-#include <gtk/gtk.h>
-#include <System.h>
-#include "window.h"
-#include "../config.h"
+#ifndef CALENDAR_WINDOW_H
+# define CALENDAR_WINDOW_H
 
 
-/* private */
-/* prototypes */
-static int _calendar(void);
-
-static int _usage(void);
+/* CalendarWindow */
+/* public */
+/* types */
+typedef struct _CalendarWindow CalendarWindow;
 
 
 /* functions */
-/* calendar */
-static int _calendar(void)
-{
-	CalendarWindow * calendar;
+CalendarWindow * calendarwindow_new(void);
+void calendarwindow_delete(CalendarWindow * calendar);
 
-	if((calendar = calendarwindow_new()) == NULL)
-		return error_print(PACKAGE);
-	gtk_main();
-	calendarwindow_delete(calendar);
-	return 0;
-}
-
-
-/* usage */
-static int _usage(void)
-{
-	fputs("Usage: calendar\n", stderr);
-	return 1;
-}
-
-
-/* main */
-int main(int argc, char * argv[])
-{
-	int o;
-
-	gtk_init(&argc, &argv);
-	while((o = getopt(argc, argv, "")) != -1)
-		switch(o)
-		{
-			default:
-				return _usage();
-		}
-	return (_calendar() == 0) ? 0 : 2;
-}
+#endif /* !CALENDAR_WINDOW_H */

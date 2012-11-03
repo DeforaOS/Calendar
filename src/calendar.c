@@ -43,8 +43,8 @@ struct _Calendar
 	Config * config;
 
 	/* widgets */
-	GtkWidget * window;
 	GtkWidget * widget;
+	GtkWidget * calendar;
 };
 
 typedef struct _CalendarEvent
@@ -63,10 +63,6 @@ typedef struct _CalendarEvent
 
 /* prototypes */
 /* accessors */
-static char const * _calendar_get_detail(Calendar * calendar, unsigned int year,
-		unsigned int month, unsigned int day);
-static int _calendar_set_detail(Calendar * calendar, unsigned int year,
-		unsigned int month, unsigned int day, char const * detail);
 static int _calendar_set_event(Calendar * calendar, CalendarEvent * event);
 /* useful */
 static int _calendar_error(Calendar * calendar, char const * message, int ret);
@@ -91,7 +87,6 @@ static char * _config_get_filename(void);
 /* functions */
 /* calendar_new */
 static void _new_config(Calendar * calendar);
-static gboolean _calendar_on_closex(gpointer data);
 static void _calendar_on_today(gpointer data);
 #if GTK_CHECK_VERSION(2, 14, 0)
 static void _calendar_on_details(GtkWidget * widget, gpointer data);
@@ -123,16 +118,9 @@ Calendar * calendar_new(void)
 	}
 	localtime_r(&now, &calendar->today);
 	_new_config(calendar);
-	/* window */
-	calendar->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-#if GTK_CHECK_VERSION(2, 6, 0)
-	gtk_window_set_icon_name(GTK_WINDOW(calendar->window),
-			"stock_calendar");
-#endif
-	gtk_window_set_title(GTK_WINDOW(calendar->window), "Calendar");
-	g_signal_connect_swapped(G_OBJECT(calendar->window), "delete-event",
-			G_CALLBACK(_calendar_on_closex), calendar);
+	/* widgets */
 	vbox = gtk_vbox_new(FALSE, 4);
+	calendar->widget = vbox;
 	/* toolbar */
 	widget = gtk_toolbar_new();
 	toolitem = gtk_tool_button_new(NULL, "Today");
@@ -159,23 +147,21 @@ Calendar * calendar_new(void)
 #endif
 	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, TRUE, 0);
 	/* calendar */
-	calendar->widget = gtk_calendar_new();
-	gtk_calendar_set_display_options(GTK_CALENDAR(calendar->widget),
+	calendar->calendar = gtk_calendar_new();
+	gtk_calendar_set_display_options(GTK_CALENDAR(calendar->calendar),
 			GTK_CALENDAR_SHOW_HEADING
 			| GTK_CALENDAR_SHOW_DAY_NAMES
 			| GTK_CALENDAR_SHOW_WEEK_NUMBERS);
 #if GTK_CHECK_VERSION(2, 14, 0)
-	gtk_calendar_set_detail_height_rows(GTK_CALENDAR(calendar->widget), 1);
-	gtk_calendar_set_detail_func(GTK_CALENDAR(calendar->widget),
+	gtk_calendar_set_detail_height_rows(GTK_CALENDAR(calendar->calendar), 1);
+	gtk_calendar_set_detail_func(GTK_CALENDAR(calendar->calendar),
 			(GtkCalendarDetailFunc)_calendar_on_detail, calendar,
 			NULL);
 #endif
-	g_signal_connect_swapped(G_OBJECT(calendar->widget),
+	g_signal_connect_swapped(G_OBJECT(calendar->calendar),
 			"day-selected-double-click", G_CALLBACK(
 				_calendar_on_edit), calendar);
-	gtk_box_pack_start(GTK_BOX(vbox), calendar->widget, TRUE, TRUE, 0);
-	gtk_container_add(GTK_CONTAINER(calendar->window), vbox);
-	gtk_widget_show_all(calendar->window);
+	gtk_box_pack_start(GTK_BOX(vbox), calendar->calendar, TRUE, TRUE, 0);
 	return calendar;
 }
 
@@ -190,15 +176,6 @@ static void _new_config(Calendar * calendar)
 	free(filename);
 }
 
-static gboolean _calendar_on_closex(gpointer data)
-{
-	Calendar * calendar = data;
-
-	gtk_widget_hide(calendar->window);
-	gtk_main_quit();
-	return FALSE;
-}
-
 static void _calendar_on_open(gpointer data)
 {
 	Calendar * calendar = data;
@@ -206,7 +183,7 @@ static void _calendar_on_open(gpointer data)
 	gchar * filename = NULL;
 
 	dialog = gtk_file_chooser_dialog_new("Open file...",
-			GTK_WINDOW(calendar->window),
+			GTK_WINDOW(gtk_widget_get_toplevel(calendar->widget)),
 			GTK_FILE_CHOOSER_ACTION_OPEN,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
@@ -224,9 +201,9 @@ static void _calendar_on_today(gpointer data)
 {
 	Calendar * calendar = data;
 
-	gtk_calendar_select_month(GTK_CALENDAR(calendar->widget),
+	gtk_calendar_select_month(GTK_CALENDAR(calendar->calendar),
 			calendar->today.tm_mon, calendar->today.tm_year + 1900);
-	gtk_calendar_select_day(GTK_CALENDAR(calendar->widget),
+	gtk_calendar_select_day(GTK_CALENDAR(calendar->calendar),
 			calendar->today.tm_mday);
 }
 
@@ -240,12 +217,12 @@ static void _calendar_on_details(GtkWidget * widget, gpointer data)
 	active = gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(
 				widget));
 	options = gtk_calendar_get_display_options(GTK_CALENDAR(
-				calendar->widget));
+				calendar->calendar));
 	if(active)
 		options |= GTK_CALENDAR_SHOW_DETAILS;
 	else
 		options &= ~GTK_CALENDAR_SHOW_DETAILS;
-	gtk_calendar_set_display_options(GTK_CALENDAR(calendar->widget),
+	gtk_calendar_set_display_options(GTK_CALENDAR(calendar->calendar),
 			options);
 }
 #endif
@@ -260,7 +237,7 @@ static gchar * _calendar_on_detail(GtkWidget * widget, guint year, guint month,
 	size_t i;
 	size_t cnt;
 
-	if((p = _calendar_get_detail(calendar, year, month + 1, day))
+	if((p = calendar_get_detail(calendar, year, month + 1, day))
 			== NULL)
 		return NULL;
 	/* XXX we have to escape pango markup */
@@ -298,7 +275,7 @@ static void _calendar_on_edit(gpointer data)
 	int res;
 
 	dialog = gtk_dialog_new_with_buttons("Edit detail",
-			GTK_WINDOW(calendar->window),
+			GTK_WINDOW(gtk_widget_get_toplevel(calendar->widget)),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
@@ -307,13 +284,13 @@ static void _calendar_on_edit(gpointer data)
 #else
 	vbox = GTK_DIALOG(dialog)->vbox;
 #endif
-	gtk_calendar_get_date(GTK_CALENDAR(calendar->widget), &year, &month,
+	gtk_calendar_get_date(GTK_CALENDAR(calendar->calendar), &year, &month,
 			&day);
 	snprintf(buf, sizeof(buf), "%s%02u/%02u/%u:", "Edit detail for ", day,
 			++month, year);
 	gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(buf), FALSE, TRUE, 0);
 	entry = gtk_entry_new();
-	if((p = _calendar_get_detail(calendar, year, month, day)) != NULL)
+	if((p = calendar_get_detail(calendar, year, month, day)) != NULL)
 		gtk_entry_set_text(GTK_ENTRY(entry), p);
 	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_show_all(vbox);
@@ -321,7 +298,7 @@ static void _calendar_on_edit(gpointer data)
 	if(res == GTK_RESPONSE_OK)
 	{
 		p = gtk_entry_get_text(GTK_ENTRY(entry));
-		_calendar_set_detail(calendar, year, month, day, p);
+		calendar_set_detail(calendar, year, month, day, p);
 	}
 	gtk_widget_destroy(dialog);
 }
@@ -336,11 +313,9 @@ void calendar_delete(Calendar * calendar)
 }
 
 
-/* private */
-/* functions */
 /* accessors */
 /* calendar_get_detail */
-static char const * _calendar_get_detail(Calendar * calendar, unsigned int year,
+char const * calendar_get_detail(Calendar * calendar, unsigned int year,
 		unsigned int month, unsigned int day)
 {
 	char buf[16];
@@ -350,8 +325,15 @@ static char const * _calendar_get_detail(Calendar * calendar, unsigned int year,
 }
 
 
+/* calendar_get_widget */
+GtkWidget * calendar_get_widget(Calendar * calendar)
+{
+	return calendar->widget;
+}
+
+
 /* calendar_set_detail */
-static int _calendar_set_detail(Calendar * calendar, unsigned int year,
+int calendar_set_detail(Calendar * calendar, unsigned int year,
 		unsigned int month, unsigned int day, char const * detail)
 {
 	int ret;
@@ -372,6 +354,9 @@ static int _calendar_set_detail(Calendar * calendar, unsigned int year,
 }
 
 
+/* private */
+/* functions */
+/* accessors */
 /* calendar_set_event */
 static int _calendar_set_event(Calendar * calendar, CalendarEvent * event)
 {
@@ -386,13 +371,13 @@ static int _calendar_set_event(Calendar * calendar, CalendarEvent * event)
 	/* FIXME check with the timezone */
 	if(localtime_r(&start, &t) == NULL)
 		return -1; /* XXX report error */
-	_calendar_set_detail(calendar, t.tm_year + 1900, t.tm_mon + 1,
+	calendar_set_detail(calendar, t.tm_year + 1900, t.tm_mon + 1,
 			t.tm_mday, event->name);
 	for(start += oneday; start < end; start += oneday)
 	{
 		if(localtime_r(&start, &t) == NULL)
 			return -1; /* XXX report error */
-		_calendar_set_detail(calendar, t.tm_year + 1900, t.tm_mon + 1,
+		calendar_set_detail(calendar, t.tm_year + 1900, t.tm_mon + 1,
 				t.tm_mday, event->name);
 	}
 	return 0;
@@ -413,7 +398,8 @@ static int _calendar_error(Calendar * calendar, char const * message, int ret)
 		return ret;
 	}
 	error = strerror(errno);
-	dialog = gtk_message_dialog_new(GTK_WINDOW(calendar->window),
+	dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(
+					calendar->widget)),
 			GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
 			GTK_BUTTONS_CLOSE,
 #if GTK_CHECK_VERSION(2, 6, 0)

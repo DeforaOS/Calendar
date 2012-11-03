@@ -17,20 +17,22 @@
 
 #include <stdlib.h>
 #include <Desktop/Mailer/plugin.h>
+#include "../src/calendar.h"
 
 
 /* Mailing-lists */
 /* private */
 /* types */
-typedef struct _MailerPlugin Calendar;
+typedef struct _MailerPlugin CalendarPlugin;
 
 struct _MailerPlugin
 {
 	MailerPluginHelper * helper;
 
+	Calendar * calendar;
+
 	/* widgets */
 	GtkWidget * widget;
-	GtkWidget * calendar;
 	GtkWidget * view;
 };
 
@@ -39,8 +41,8 @@ struct _MailerPlugin
 /* prototypes */
 /* plug-in */
 static MailerPlugin * _calendar_init(MailerPluginHelper * helper);
-static void _calendar_destroy(Calendar * calendar);
-static GtkWidget * _calendar_get_widget(Calendar * calendar);
+static void _calendar_destroy(CalendarPlugin * calendar);
+static GtkWidget * _calendar_get_widget(CalendarPlugin * calendar);
 
 
 /* public */
@@ -64,30 +66,21 @@ MailerPluginDefinition plugin =
 /* calendar_init */
 static MailerPlugin * _calendar_init(MailerPluginHelper * helper)
 {
-	Calendar * calendar;
+	CalendarPlugin * calendar;
 	GtkWidget * widget;
 
 	if((calendar = malloc(sizeof(*calendar))) == NULL)
 		return NULL;
+	calendar->calendar = calendar_new();
+	if(calendar->calendar == NULL)
+	{
+		_calendar_destroy(calendar);
+		return NULL;
+	}
 	calendar->helper = helper;
 	calendar->widget = gtk_vbox_new(FALSE, 4);
-	/* XXX code duplicated from the Calendar class */
-	calendar->calendar = gtk_calendar_new();
-	gtk_calendar_set_display_options(GTK_CALENDAR(calendar->calendar),
-			GTK_CALENDAR_SHOW_HEADING
-			| GTK_CALENDAR_SHOW_DAY_NAMES
-			| GTK_CALENDAR_SHOW_WEEK_NUMBERS);
-#if GTK_CHECK_VERSION(2, 14, 0)
-	gtk_calendar_set_detail_height_rows(GTK_CALENDAR(calendar->calendar),
-			1);
-# if 0 /* XXX allow callbacks to be re-used from the Calendar class */
-	gtk_calendar_set_detail_func(GTK_CALENDAR(calendar->calendar),
-			(GtkCalendarDetailFunc)_calendar_on_detail, calendar,
-			NULL);
-# endif
-#endif
-	gtk_box_pack_start(GTK_BOX(calendar->widget), calendar->calendar, FALSE,
-			TRUE, 0);
+	widget = calendar_get_widget(calendar->calendar);
+	gtk_box_pack_start(GTK_BOX(calendar->widget), widget, FALSE, TRUE, 0);
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -100,14 +93,16 @@ static MailerPlugin * _calendar_init(MailerPluginHelper * helper)
 
 
 /* calendar_destroy */
-static void _calendar_destroy(Calendar * calendar)
+static void _calendar_destroy(CalendarPlugin * calendar)
 {
+	if(calendar->calendar != NULL)
+		calendar_delete(calendar->calendar);
 	free(calendar);
 }
 
 
 /* calendar_get_widget */
-static GtkWidget * _calendar_get_widget(Calendar * calendar)
+static GtkWidget * _calendar_get_widget(CalendarPlugin * calendar)
 {
 	return calendar->widget;
 }

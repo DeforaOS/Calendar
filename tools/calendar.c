@@ -31,6 +31,7 @@ struct _MailerPlugin
 	/* widgets */
 	GtkWidget * widget;
 	GtkWidget * calendar;
+	GtkWidget * view;
 };
 
 
@@ -64,6 +65,7 @@ MailerPluginDefinition plugin =
 static MailerPlugin * _calendar_init(MailerPluginHelper * helper)
 {
 	Calendar * calendar;
+	GtkWidget * widget;
 
 	if((calendar = malloc(sizeof(*calendar))) == NULL)
 		return NULL;
@@ -84,8 +86,14 @@ static MailerPlugin * _calendar_init(MailerPluginHelper * helper)
 			NULL);
 # endif
 #endif
-	gtk_box_pack_start(GTK_BOX(calendar->widget), calendar->calendar, TRUE,
+	gtk_box_pack_start(GTK_BOX(calendar->widget), calendar->calendar, FALSE,
 			TRUE, 0);
+	widget = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	calendar->view = gtk_tree_view_new();
+	gtk_container_add(GTK_CONTAINER(widget), calendar->view);
+	gtk_box_pack_start(GTK_BOX(calendar->widget), widget, TRUE, TRUE, 0);
 	gtk_widget_show_all(calendar->widget);
 	return calendar;
 }

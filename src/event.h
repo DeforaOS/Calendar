@@ -15,27 +15,30 @@
 
 
 
-#ifndef CALENDAR_CALENDAR_H
-# define CALENDAR_CALENDAR_H
+#ifndef CALENDAR_EVENT_H
+# define CALENDAR_EVENT_H
 
 
-/* Calendar */
+/* CalendarEvent */
 /* public */
 /* types */
-typedef struct _Calendar Calendar;
+typedef struct _CalendarEvent CalendarEvent;
 
 
 /* functions */
-Calendar * calendar_new(void);
-void calendar_delete(Calendar * calendar);
+CalendarEvent * calendarevent_new(void);
+void calendarevent_delete(CalendarEvent * event);
 
 /* accessors */
-/* details */
-char const * calendar_get_detail(Calendar * calendar, unsigned int year,
-		unsigned int month, unsigned int day);
-int calendar_set_detail(Calendar * calendar, unsigned int year,
-		unsigned int month, unsigned int day, char const * detail);
+time_t calendarevent_get_end(CalendarEvent * event);
+char const * calendarevent_get_name(CalendarEvent * event);
+time_t calendarevent_get_start(CalendarEvent * event);
 
-GtkWidget * calendar_get_widget(Calendar * calendar);
+int calendarevent_set_description(CalendarEvent * event,
+		char const * description);
+int calendarevent_set_end(CalendarEvent * event, time_t end);
+int calendarevent_set_location(CalendarEvent * event, char const * location);
+int calendarevent_set_name(CalendarEvent * event, char const * name);
+int calendarevent_set_start(CalendarEvent * event, time_t start);
 
-#endif /* !CALENDAR_CALENDAR_H */
+#endif /* !CALENDAR_EVENT_H */

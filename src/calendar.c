@@ -1,6 +1,6 @@
 /* $Id$ */
-/* Copyright (c) 2011-2012 Pierre Pronchery <khorben@defora.org> */
-/* This file is part of DeforaOS Desktop Accessories */
+/* Copyright (c) 2012 Pierre Pronchery <khorben@defora.org> */
+/* This file is part of DeforaOS Desktop Calendar */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <gtk/gtk.h>
 #include <System.h>
+#include "event.h"
 #include "calendar.h"
 #include "../config.h"
 
@@ -47,15 +48,6 @@ struct _Calendar
 	GtkWidget * calendar;
 };
 
-typedef struct _CalendarEvent
-{
-	char * name;
-	char * location;
-	time_t start;
-	time_t end;
-	char * description;
-} CalendarEvent;
-
 
 /* constants */
 #define CALENDAR_CONFIG_FILE ".calendar"
@@ -67,18 +59,6 @@ static int _calendar_set_event(Calendar * calendar, CalendarEvent * event);
 /* useful */
 static int _calendar_error(Calendar * calendar, char const * message, int ret);
 static int _calendar_open(Calendar * calendar, char const * filename);
-
-/* events */
-static CalendarEvent * _calendar_event_new(void);
-static void _calendar_event_delete(CalendarEvent * event);
-/* accessors */
-static int _calendar_event_set_description(CalendarEvent * event,
-		char const * description);
-static int _calendar_event_set_end(CalendarEvent * event, time_t end);
-static int _calendar_event_set_location(CalendarEvent * event,
-		char const * location);
-static int _calendar_event_set_name(CalendarEvent * event, char const * name);
-static int _calendar_event_set_start(CalendarEvent * event, time_t start);
 
 static char * _config_get_filename(void);
 
@@ -365,20 +345,21 @@ static int _calendar_set_event(Calendar * calendar, CalendarEvent * event)
 	struct tm t;
 	const int oneday = 60 * 60 * 24;
 
-	if((start = event->start) < 0 || (end = event->end) < 0)
+	if((start = calendarevent_get_start(event)) < 0
+			|| (end = calendarevent_get_end(event)) < 0)
 		return -1; /* XXX report error */
 	memset(&t, 0, sizeof(start));
 	/* FIXME check with the timezone */
 	if(localtime_r(&start, &t) == NULL)
 		return -1; /* XXX report error */
 	calendar_set_detail(calendar, t.tm_year + 1900, t.tm_mon + 1,
-			t.tm_mday, event->name);
+			t.tm_mday, calendarevent_get_name(event));
 	for(start += oneday; start < end; start += oneday)
 	{
 		if(localtime_r(&start, &t) == NULL)
 			return -1; /* XXX report error */
 		calendar_set_detail(calendar, t.tm_year + 1900, t.tm_mon + 1,
-				t.tm_mday, event->name);
+				t.tm_mday, calendarevent_get_name(event));
 	}
 	return 0;
 }
@@ -509,7 +490,7 @@ static int _open_parse_event(Calendar * calendar, char const * filename,
 #ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s()\n", __func__);
 #endif
-	if((event = _calendar_event_new()) == NULL)
+	if((event = calendarevent_new()) == NULL)
 		return -1;
 	for(;;)
 	{
@@ -532,7 +513,7 @@ static int _open_parse_event(Calendar * calendar, char const * filename,
 	}
 	if(ret == 0)
 		_calendar_set_event(calendar, event);
-	_calendar_event_delete(event);
+	calendarevent_delete(event);
 	if(ferror(fp))
 		return -_calendar_error(calendar, filename, 1);
 	return ret;
@@ -593,7 +574,7 @@ static int _open_parse_event_description(CalendarEvent * event,
 		else
 			p[j] = value[i];
 	p[j] = '\0';
-	ret = _calendar_event_set_description(event, p);
+	ret = calendarevent_set_description(event, p);
 	free(p);
 	return ret;
 }
@@ -610,7 +591,7 @@ static int _open_parse_event_dtend(CalendarEvent * event, char const * value)
 	tm.tm_year -= 1900;
 	tm.tm_mon--;
 	t = mktime(&tm);
-	return _calendar_event_set_end(event, t);
+	return calendarevent_set_end(event, t);
 }
 
 static int _open_parse_event_dtstart(CalendarEvent * event, char const * value)
@@ -625,104 +606,18 @@ static int _open_parse_event_dtstart(CalendarEvent * event, char const * value)
 	tm.tm_year -= 1900;
 	tm.tm_mon--;
 	t = mktime(&tm);
-	return _calendar_event_set_start(event, t);
+	return calendarevent_set_start(event, t);
 }
 
 static int _open_parse_event_location(CalendarEvent * event,
 		char const * value)
 {
-	return _calendar_event_set_location(event, value);
+	return calendarevent_set_location(event, value);
 }
 
 static int _open_parse_event_summary(CalendarEvent * event, char const * value)
 {
-	return _calendar_event_set_name(event, value);
-}
-
-
-/* calendar_event_new */
-static CalendarEvent * _calendar_event_new(void)
-{
-	CalendarEvent * event;
-
-	if((event = object_new(sizeof(*event))) == NULL)
-		return NULL;
-	memset(event, 0, sizeof(*event));
-	event->start = -1;
-	event->end = -1;
-	return event;
-}
-
-
-/* calendar_event_delete */
-static void _calendar_event_delete(CalendarEvent * event)
-{
-	free(event->name);
-	free(event->location);
-	free(event->description);
-	object_delete(event);
-}
-
-
-/* accessors */
-/* calendar_event_set_description */
-static int _calendar_event_set_description(CalendarEvent * event,
-		char const * description)
-{
-	char * p;
-
-	if((p = strdup(description)) == NULL)
-		return -1;
-	free(event->description);
-	event->description = p;
-	return 0;
-}
-
-
-/* calendar_event_set_end */
-static int _calendar_event_set_end(CalendarEvent * event, time_t end)
-{
-	event->end = end;
-	if(event->start > end)
-		event->start = end;
-	return 0;
-}
-
-
-/* calendar_event_set_location */
-static int _calendar_event_set_location(CalendarEvent * event,
-		char const * location)
-{
-	char * p;
-
-	if((p = strdup(location)) == NULL)
-		return -1;
-	free(event->location);
-	event->location = p;
-	return 0;
-}
-
-
-/* calendar_event_set_name */
-static int _calendar_event_set_name(CalendarEvent * event, char const * name)
-{
-	char * p;
-
-	if((p = strdup(name)) == NULL)
-		return -1;
-	free(event->name);
-	event->name = p;
-	return 0;
-}
-
-
-/* calendar_event_set_start */
-static int _calendar_event_set_start(CalendarEvent * event, time_t start)
-{
-	event->start = start;
-	if(event->end < start)
-		event->end = start;
-	return 0;
+	return calendarevent_set_name(event, value);
 }
 
 

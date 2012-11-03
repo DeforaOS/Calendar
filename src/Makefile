@@ -17,15 +17,18 @@ INSTALL	?= install
 
 all: $(TARGETS)
 
-calendar_OBJS = calendar.o window.o main.o
+calendar_OBJS = calendar.o event.o window.o main.o
 calendar_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
 calendar_LDFLAGS = $(LDFLAGSF) $(LDFLAGS)
 
 calendar: $(calendar_OBJS)
 	$(CC) -o calendar $(calendar_OBJS) $(calendar_LDFLAGS)
 
-calendar.o: calendar.c calendar.h ../config.h
+calendar.o: calendar.c calendar.h event.h ../config.h
 	$(CC) $(calendar_CFLAGS) -fPIC -c calendar.c
+
+event.o: event.c event.h
+	$(CC) $(calendar_CFLAGS) -fPIC -c event.c
 
 window.o: window.c calendar.h window.h
 	$(CC) $(calendar_CFLAGS) -c window.c

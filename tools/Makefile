@@ -21,7 +21,7 @@ all: $(TARGETS)
 
 calendar_OBJS = calendar.o
 calendar_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
-calendar_LDFLAGS = $(LDFLAGSF) $(LDFLAGS) ../src/calendar.o
+calendar_LDFLAGS = $(LDFLAGSF) $(LDFLAGS) ../src/calendar.o ../src/event.o
 
 calendar.so: $(calendar_OBJS)
 	$(CCSHARED) -o calendar.so $(calendar_OBJS) $(calendar_LDFLAGS)

@@ -1,6 +1,6 @@
 /* $Id$ */
 /* Copyright (c) 2012 Pierre Pronchery <khorben@defora.org> */
-/* This file is part of DeforaOS Desktop Mailer */
+/* This file is part of DeforaOS Desktop Calendar */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
@@ -71,8 +71,7 @@ static MailerPlugin * _calendar_init(MailerPluginHelper * helper)
 
 	if((calendar = malloc(sizeof(*calendar))) == NULL)
 		return NULL;
-	calendar->calendar = calendar_new();
-	if(calendar->calendar == NULL)
+	if((calendar->calendar = calendar_new()) == NULL)
 	{
 		_calendar_destroy(calendar);
 		return NULL;

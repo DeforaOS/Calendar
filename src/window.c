@@ -89,5 +89,5 @@ static gboolean _calendarwindow_on_closex(gpointer data)
 
 	gtk_widget_hide(calendar->window);
 	gtk_main_quit();
-	return FALSE;
+	return TRUE;
 }

@@ -29,6 +29,11 @@
 #include "calendar.h"
 #include "../config.h"
 
+/* constants */
+#ifndef PROGNAME
+# define PROGNAME		"calendar"
+#endif
+
 /* macros */
 #ifdef __WIN32__
 # define localtime_r(a, b)	localtime_s(b, a)
@@ -50,7 +55,7 @@ struct _Calendar
 
 
 /* constants */
-#define CALENDAR_CONFIG_FILE ".calendar"
+#define CALENDAR_CONFIG_FILE	".calendar"
 
 
 /* prototypes */
@@ -137,7 +142,8 @@ Calendar * calendar_new(void)
 			| GTK_CALENDAR_SHOW_DAY_NAMES
 			| GTK_CALENDAR_SHOW_WEEK_NUMBERS);
 #if GTK_CHECK_VERSION(2, 14, 0)
-	gtk_calendar_set_detail_height_rows(GTK_CALENDAR(calendar->calendar), 1);
+	gtk_calendar_set_detail_height_rows(GTK_CALENDAR(calendar->calendar),
+			1);
 	gtk_calendar_set_detail_func(GTK_CALENDAR(calendar->calendar),
 			(GtkCalendarDetailFunc)_calendar_on_detail, calendar,
 			NULL);
@@ -378,7 +384,7 @@ static int _calendar_error(Calendar * calendar, char const * message, int ret)
 
 	if(calendar == NULL)
 	{
-		fputs(PACKAGE, stderr);
+		fputs(PROGNAME, stderr);
 		perror(message);
 		return ret;
 	}
@@ -442,7 +448,7 @@ static int _open_parse(Calendar * calendar, char const * filename, FILE * fp)
 		if(ferror(fp))
 			return -_calendar_error(calendar, filename, 1);
 		/* FIXME report error */
-		fprintf(stderr, "%s: %s: %s\n", PACKAGE, filename,
+		fprintf(stderr, "%s: %s: %s\n", PROGNAME, filename,
 				"Not a valid calendar");
 		return -1;
 	}

@@ -37,7 +37,7 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(LIBDIR)/Mailer/plugins
-	$(INSTALL) -m 0644 -- calendar.so $(DESTDIR)$(LIBDIR)/Mailer/plugins/calendar.so
+	$(INSTALL) -m 0644 calendar.so $(DESTDIR)$(LIBDIR)/Mailer/plugins/calendar.so
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(LIBDIR)/Mailer/plugins/calendar.so

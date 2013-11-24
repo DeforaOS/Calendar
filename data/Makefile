@@ -13,7 +13,7 @@ distclean: clean
 
 install:
 	$(MKDIR) $(DESTDIR)$(PREFIX)/share/applications
-	$(INSTALL) -m 0644 -- calendar.desktop $(DESTDIR)$(PREFIX)/share/applications/calendar.desktop
+	$(INSTALL) -m 0644 calendar.desktop $(DESTDIR)$(PREFIX)/share/applications/calendar.desktop
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(PREFIX)/share/applications/calendar.desktop

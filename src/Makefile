@@ -44,7 +44,7 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 0755 -- calendar $(DESTDIR)$(BINDIR)/calendar
+	$(INSTALL) -m 0755 calendar $(DESTDIR)$(BINDIR)/calendar
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(BINDIR)/calendar

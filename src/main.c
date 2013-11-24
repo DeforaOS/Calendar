@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2012-2013 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Calendar */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,11 @@
 #include <System.h>
 #include "window.h"
 #include "../config.h"
+
+/* constants */
+#ifndef PROGNAME
+# define PROGNAME	"calendar"
+#endif
 
 
 /* private */
@@ -47,7 +52,7 @@ static int _calendar(void)
 /* usage */
 static int _usage(void)
 {
-	fputs("Usage: calendar\n", stderr);
+	fprintf(stderr, "Usage: %s\n", PROGNAME);
 	return 1;
 }
 

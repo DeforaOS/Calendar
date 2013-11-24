@@ -33,7 +33,7 @@ event.o: event.c event.h
 window.o: window.c calendar.h window.h
 	$(CC) $(calendar_CFLAGS) -c window.c
 
-main.o: main.c window.h
+main.o: main.c calendar.h window.h
 	$(CC) $(calendar_CFLAGS) -c main.c
 
 clean:

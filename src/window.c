@@ -65,7 +65,7 @@ CalendarWindow * calendarwindow_new(void)
 			G_CALLBACK(_calendarwindow_on_closex), calendar);
 	widget = calendar_get_widget(calendar->calendar);
 	gtk_container_add(GTK_CONTAINER(calendar->window), widget);
-	gtk_widget_show_all(calendar->window);
+	gtk_widget_show(calendar->window);
 	return calendar;
 }
 

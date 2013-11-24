@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /* TODO:
- * - complete iCal support */
+ * - complete iCal support (and move it to the CalendarEvent class) */
 
 
 
@@ -152,6 +152,7 @@ Calendar * calendar_new(void)
 			"day-selected-double-click", G_CALLBACK(
 				_calendar_on_edit), calendar);
 	gtk_box_pack_start(GTK_BOX(vbox), calendar->calendar, TRUE, TRUE, 0);
+	gtk_widget_show_all(vbox);
 	return calendar;
 }
 

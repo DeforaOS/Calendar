@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Calendar
+TryExec=calendar
 Exec=calendar
 Icon=stock_calendar
 Type=Application

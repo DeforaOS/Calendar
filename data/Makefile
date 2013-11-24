@@ -13,9 +13,9 @@ distclean: clean
 
 install:
 	$(MKDIR) $(DESTDIR)$(PREFIX)/share/applications
-	$(INSTALL) -m 0644 calendar.desktop $(DESTDIR)$(PREFIX)/share/applications/calendar.desktop
+	$(INSTALL) -m 0644 deforaos-calendar.desktop $(DESTDIR)$(PREFIX)/share/applications/deforaos-calendar.desktop
 
 uninstall:
-	$(RM) -- $(DESTDIR)$(PREFIX)/share/applications/calendar.desktop
+	$(RM) -- $(DESTDIR)$(PREFIX)/share/applications/deforaos-calendar.desktop
 
 .PHONY: all clean distclean install uninstall

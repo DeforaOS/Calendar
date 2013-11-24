@@ -22,7 +22,7 @@ dist:
 	$(LN) -s -- . $(PACKAGE)-$(VERSION)
 	@$(TAR) $(PACKAGE)-$(VERSION).tar.gz -- \
 		$(PACKAGE)-$(VERSION)/data/Makefile \
-		$(PACKAGE)-$(VERSION)/data/calendar.desktop \
+		$(PACKAGE)-$(VERSION)/data/deforaos-calendar.desktop \
 		$(PACKAGE)-$(VERSION)/data/project.conf \
 		$(PACKAGE)-$(VERSION)/src/calendar.c \
 		$(PACKAGE)-$(VERSION)/src/event.c \

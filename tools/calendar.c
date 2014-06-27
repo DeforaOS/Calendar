@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2012-2014 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Calendar */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,11 @@ static MailerPlugin * _calendar_init(MailerPluginHelper * helper)
 		return NULL;
 	}
 	calendar->helper = helper;
+#if GTK_CHECK_VERSION(3, 0, 0)
+	calendar->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+#else
 	calendar->widget = gtk_vbox_new(FALSE, 4);
+#endif
 	widget = calendar_get_widget(calendar->calendar);
 	gtk_box_pack_start(GTK_BOX(calendar->widget), widget, FALSE, TRUE, 0);
 	widget = gtk_scrolled_window_new(NULL, NULL);

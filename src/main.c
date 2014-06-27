@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2012-2013 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2012-2014 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Calendar */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <gtk/gtk.h>
+#if GTK_CHECK_VERSION(3, 0, 0)
+# include <gtk/gtkx.h>
+#endif
 #include <System.h>
 #include "calendar.h"
 #include "window.h"

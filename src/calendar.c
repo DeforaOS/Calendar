@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2010-2013 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2010-2014 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Calendar */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,23 +114,23 @@ Calendar * calendar_new(void)
 	widget = gtk_toolbar_new();
 	toolitem = gtk_tool_button_new(NULL, "Today");
 	gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(toolitem), "go-jump");
-	g_signal_connect_swapped(G_OBJECT(toolitem), "clicked", G_CALLBACK(
+	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_calendar_on_today), calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 #if GTK_CHECK_VERSION(2, 14, 0)
 	toolitem = gtk_separator_tool_item_new();
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 	toolitem = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
-	g_signal_connect_swapped(G_OBJECT(toolitem), "clicked", G_CALLBACK(
+	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_calendar_on_open), calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 	toolitem = gtk_toggle_tool_button_new();
 	gtk_tool_button_set_label(GTK_TOOL_BUTTON(toolitem), "Details");
-	g_signal_connect(G_OBJECT(toolitem), "toggled", G_CALLBACK(
-				_calendar_on_details), calendar);
+	g_signal_connect(toolitem, "toggled", G_CALLBACK(_calendar_on_details),
+			calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 	toolitem = gtk_tool_button_new_from_stock(GTK_STOCK_EDIT);
-	g_signal_connect_swapped(G_OBJECT(toolitem), "clicked", G_CALLBACK(
+	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_calendar_on_edit), calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 #endif
@@ -148,7 +148,7 @@ Calendar * calendar_new(void)
 			(GtkCalendarDetailFunc)_calendar_on_detail, calendar,
 			NULL);
 #endif
-	g_signal_connect_swapped(G_OBJECT(calendar->calendar),
+	g_signal_connect_swapped(calendar->calendar,
 			"day-selected-double-click", G_CALLBACK(
 				_calendar_on_edit), calendar);
 	gtk_box_pack_start(GTK_BOX(vbox), calendar->calendar, TRUE, TRUE, 0);

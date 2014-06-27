@@ -61,8 +61,8 @@ CalendarWindow * calendarwindow_new(void)
 			"stock_calendar");
 #endif
 	gtk_window_set_title(GTK_WINDOW(calendar->window), "Calendar");
-	g_signal_connect_swapped(G_OBJECT(calendar->window), "delete-event",
-			G_CALLBACK(_calendarwindow_on_closex), calendar);
+	g_signal_connect_swapped(calendar->window, "delete-event", G_CALLBACK(
+				_calendarwindow_on_closex), calendar);
 	widget = calendar_get_widget(calendar->calendar);
 	gtk_container_add(GTK_CONTAINER(calendar->window), widget);
 	gtk_widget_show(calendar->window);

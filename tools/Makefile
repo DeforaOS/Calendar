@@ -1,4 +1,5 @@
-TARGETS	= calendar.so
+TARGETS	= $(OBJDIR)calendar.so
+OBJDIR	=
 PREFIX	= /usr/local
 DESTDIR	=
 LIBDIR	= $(PREFIX)/lib
@@ -19,15 +20,15 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-calendar_OBJS = calendar.o
+calendar_OBJS = $(OBJDIR)calendar.o
 calendar_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
 calendar_LDFLAGS = $(LDFLAGSF) $(LDFLAGS) ../src/calendar.o ../src/event.o
 
-calendar.so: $(calendar_OBJS)
-	$(CCSHARED) -o calendar.so $(calendar_OBJS) $(calendar_LDFLAGS)
+$(OBJDIR)calendar.so: $(calendar_OBJS)
+	$(CCSHARED) -o $(OBJDIR)calendar.so $(calendar_OBJS) $(calendar_LDFLAGS)
 
-calendar.o: calendar.c
-	$(CC) $(calendar_CFLAGS) -c calendar.c
+$(OBJDIR)calendar.o: calendar.c
+	$(CC) $(calendar_CFLAGS) -o $(OBJDIR)calendar.o -c calendar.c
 
 clean:
 	$(RM) -- $(calendar_OBJS)
@@ -37,7 +38,7 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(LIBDIR)/Mailer/plugins
-	$(INSTALL) -m 0644 calendar.so $(DESTDIR)$(LIBDIR)/Mailer/plugins/calendar.so
+	$(INSTALL) -m 0755 $(OBJDIR)calendar.so $(DESTDIR)$(LIBDIR)/Mailer/plugins/calendar.so
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(LIBDIR)/Mailer/plugins/calendar.so

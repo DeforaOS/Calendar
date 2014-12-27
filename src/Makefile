@@ -1,4 +1,5 @@
-TARGETS	= calendar
+TARGETS	= $(OBJDIR)calendar
+OBJDIR	=
 PREFIX	= /usr/local
 DESTDIR	=
 BINDIR	= $(PREFIX)/bin
@@ -17,24 +18,24 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-calendar_OBJS = calendar.o event.o window.o main.o
+calendar_OBJS = $(OBJDIR)calendar.o $(OBJDIR)event.o $(OBJDIR)window.o $(OBJDIR)main.o
 calendar_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
 calendar_LDFLAGS = $(LDFLAGSF) $(LDFLAGS)
 
-calendar: $(calendar_OBJS)
-	$(CC) -o calendar $(calendar_OBJS) $(calendar_LDFLAGS)
+$(OBJDIR)calendar: $(calendar_OBJS)
+	$(CC) -o $(OBJDIR)calendar $(calendar_OBJS) $(calendar_LDFLAGS)
 
-calendar.o: calendar.c calendar.h event.h ../config.h
-	$(CC) $(calendar_CFLAGS) -fPIC -c calendar.c
+$(OBJDIR)calendar.o: calendar.c calendar.h event.h ../config.h
+	$(CC) $(calendar_CFLAGS) -fPIC -o $(OBJDIR)calendar.o -c calendar.c
 
-event.o: event.c event.h
-	$(CC) $(calendar_CFLAGS) -fPIC -c event.c
+$(OBJDIR)event.o: event.c event.h
+	$(CC) $(calendar_CFLAGS) -fPIC -o $(OBJDIR)event.o -c event.c
 
-window.o: window.c calendar.h window.h
-	$(CC) $(calendar_CFLAGS) -c window.c
+$(OBJDIR)window.o: window.c calendar.h window.h
+	$(CC) $(calendar_CFLAGS) -o $(OBJDIR)window.o -c window.c
 
-main.o: main.c calendar.h window.h
-	$(CC) $(calendar_CFLAGS) -c main.c
+$(OBJDIR)main.o: main.c calendar.h window.h
+	$(CC) $(calendar_CFLAGS) -o $(OBJDIR)main.o -c main.c
 
 clean:
 	$(RM) -- $(calendar_OBJS)
@@ -44,7 +45,7 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 0755 calendar $(DESTDIR)$(BINDIR)/calendar
+	$(INSTALL) -m 0755 $(OBJDIR)calendar $(DESTDIR)$(BINDIR)/calendar
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(BINDIR)/calendar

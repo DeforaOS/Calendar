@@ -19,6 +19,9 @@
 #include <Desktop/Mailer/plugin.h>
 #include "../src/calendar.h"
 
+#include "../src/calendar.c"
+#include "../src/event.c"
+
 
 /* Mailing-lists */
 /* private */

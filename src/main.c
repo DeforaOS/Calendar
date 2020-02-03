@@ -17,6 +17,8 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <locale.h>
+#include <libintl.h>
 #include <gtk/gtk.h>
 #if GTK_CHECK_VERSION(3, 0, 0)
 # include <gtk/gtkx.h>
@@ -25,10 +27,20 @@
 #include "calendar.h"
 #include "window.h"
 #include "../config.h"
+#define _(string) gettext(string)
 
 /* constants */
 #ifndef PROGNAME_CALENDAR
 # define PROGNAME_CALENDAR	"calendar"
+#endif
+#ifndef PREFIX
+# define PREFIX			"/usr/local"
+#endif
+#ifndef DATADIR
+# define DATADIR		PREFIX "/share"
+#endif
+#ifndef LOCALEDIR
+# define LOCALEDIR		DATADIR "/locale"
 #endif
 
 
@@ -37,6 +49,7 @@
 /* prototypes */
 static int _calendar(int embedded);
 
+static int _error(char const * message, int ret);
 static int _usage(void);
 
 
@@ -93,6 +106,15 @@ static void _embedded_on_embedded(gpointer data)
 }
 
 
+/* error */
+static int _error(char const * message, int ret)
+{
+	fputs(PROGNAME_CALENDAR ": ", stderr);
+	perror(message);
+	return ret;
+}
+
+
 /* usage */
 static int _usage(void)
 {
@@ -109,6 +131,10 @@ int main(int argc, char * argv[])
 	int o;
 	int embedded = 0;
 
+	if(setlocale(LC_ALL, "") == NULL)
+		_error("setlocale", 1);
+	bindtextdomain(PACKAGE, LOCALEDIR);
+	textdomain(PACKAGE);
 	gtk_init(&argc, &argv);
 	while((o = getopt(argc, argv, "x")) != -1)
 		switch(o)

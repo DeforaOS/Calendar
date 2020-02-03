@@ -23,11 +23,13 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include <libintl.h>
 #include <gtk/gtk.h>
 #include <System.h>
 #include "event.h"
 #include "calendar.h"
 #include "../config.h"
+#define _(string) gettext(string)
 
 /* constants */
 #ifndef PROGNAME_CALENDAR
@@ -112,7 +114,7 @@ Calendar * calendar_new(void)
 	calendar->widget = vbox;
 	/* toolbar */
 	widget = gtk_toolbar_new();
-	toolitem = gtk_tool_button_new(NULL, "Today");
+	toolitem = gtk_tool_button_new(NULL, _("Today"));
 	gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(toolitem), "go-jump");
 	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_calendar_on_today), calendar);
@@ -125,7 +127,7 @@ Calendar * calendar_new(void)
 				_calendar_on_open), calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 	toolitem = gtk_toggle_tool_button_new();
-	gtk_tool_button_set_label(GTK_TOOL_BUTTON(toolitem), "Details");
+	gtk_tool_button_set_label(GTK_TOOL_BUTTON(toolitem), _("Details"));
 	g_signal_connect(toolitem, "toggled", G_CALLBACK(_calendar_on_details),
 			calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
@@ -173,7 +175,7 @@ static void _calendar_on_open(gpointer data)
 	GtkWidget * dialog;
 	gchar * filename = NULL;
 
-	dialog = gtk_file_chooser_dialog_new("Open file...",
+	dialog = gtk_file_chooser_dialog_new(_("Open file..."),
 			GTK_WINDOW(gtk_widget_get_toplevel(calendar->widget)),
 			GTK_FILE_CHOOSER_ACTION_OPEN,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -259,14 +261,14 @@ static void _calendar_on_edit(gpointer data)
 	guint year;
 	guint month;
 	guint day;
-	char buf[32];
+	char buf[64];
 	char const * p;
 	GtkWidget * dialog;
 	GtkWidget * vbox;
 	GtkWidget * entry;
 	int res;
 
-	dialog = gtk_dialog_new_with_buttons("Edit detail",
+	dialog = gtk_dialog_new_with_buttons(_("Edit detail"),
 			GTK_WINDOW(gtk_widget_get_toplevel(calendar->widget)),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -278,8 +280,8 @@ static void _calendar_on_edit(gpointer data)
 #endif
 	gtk_calendar_get_date(GTK_CALENDAR(calendar->calendar), &year, &month,
 			&day);
-	snprintf(buf, sizeof(buf), "%s%02u/%02u/%u:", "Edit detail for ", day,
-			++month, year);
+	snprintf(buf, sizeof(buf), "%s%02u/%02u/%u:", _("Edit detail for "),
+			day, ++month, year);
 	gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(buf), FALSE, TRUE, 0);
 	entry = gtk_entry_new();
 	if((p = calendar_get_detail(calendar, year, month, day)) != NULL)
@@ -396,12 +398,12 @@ static int _calendar_error(Calendar * calendar, char const * message, int ret)
 			GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
 			GTK_BUTTONS_CLOSE,
 #if GTK_CHECK_VERSION(2, 6, 0)
-			"%s", "Error");
+			"%s", _("Error"));
 	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
 #endif
 			"%s%s%s", message ? message : "", message ? ": " : "",
 			error);
-	gtk_window_set_title(GTK_WINDOW(dialog), "Error");
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Error"));
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 	return ret;
@@ -451,7 +453,7 @@ static int _open_parse(Calendar * calendar, char const * filename, FILE * fp)
 			return -_calendar_error(calendar, filename, 1);
 		/* FIXME report error */
 		fprintf(stderr, "%s: %s: %s\n", PROGNAME_CALENDAR, filename,
-				"Not a valid calendar");
+				_("Not a valid calendar"));
 		return -1;
 	}
 	ret = _open_parse_headers(calendar, filename, fp, buf, sizeof(buf));

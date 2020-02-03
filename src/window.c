@@ -16,9 +16,11 @@
 
 
 #include <stdlib.h>
+#include <libintl.h>
 #include <gtk/gtk.h>
 #include "calendar.h"
 #include "window.h"
+#define _(string) gettext(string)
 
 
 /* CalendarWindow */
@@ -60,7 +62,7 @@ CalendarWindow * calendarwindow_new(void)
 	gtk_window_set_icon_name(GTK_WINDOW(calendar->window),
 			"stock_calendar");
 #endif
-	gtk_window_set_title(GTK_WINDOW(calendar->window), "Calendar");
+	gtk_window_set_title(GTK_WINDOW(calendar->window), _("Calendar"));
 	g_signal_connect_swapped(calendar->window, "delete-event", G_CALLBACK(
 				_calendarwindow_on_closex), calendar);
 	widget = calendar_get_widget(calendar->calendar);

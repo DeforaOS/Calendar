@@ -397,7 +397,7 @@ static int _calendar_error(Calendar * calendar, char const * message, int ret)
 					calendar->widget)),
 			GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
 			GTK_BUTTONS_CLOSE,
-#if GTK_CHECK_VERSION(2, 6, 0)
+#if GTK_CHECK_VERSION(2, 8, 0)
 			"%s", _("Error"));
 	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
 #endif

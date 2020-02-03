@@ -123,7 +123,8 @@ Calendar * calendar_new(void)
 #if GTK_CHECK_VERSION(2, 14, 0)
 	toolitem = gtk_separator_tool_item_new();
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
-	toolitem = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
+	toolitem = gtk_tool_button_new(NULL, _("Open"));
+	gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(toolitem), "gtk-open");
 	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_calendar_on_open), calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
@@ -132,7 +133,8 @@ Calendar * calendar_new(void)
 	g_signal_connect(toolitem, "toggled", G_CALLBACK(_calendar_on_details),
 			calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
-	toolitem = gtk_tool_button_new_from_stock(GTK_STOCK_EDIT);
+	toolitem = gtk_tool_button_new(NULL, _("Edit"));
+	gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(toolitem), "gtk-edit");
 	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_calendar_on_edit), calendar);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);

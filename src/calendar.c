@@ -227,6 +227,7 @@ static gchar * _calendar_on_detail(GtkWidget * widget, guint year, guint month,
 	char const * p;
 	size_t i;
 	size_t cnt;
+	(void) widget;
 
 	if((p = calendar_get_detail(calendar, year, month + 1, day))
 			== NULL)

@@ -1,5 +1,7 @@
 Makefile
+*~
 *.dylib
 *.o
 *.so
 /config.h
+/config.sh

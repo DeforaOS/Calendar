@@ -2,3 +2,4 @@ Makefile
 *.dylib
 *.o
 *.so
+/config.h

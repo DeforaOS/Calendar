@@ -27,8 +27,8 @@
 #include "../config.h"
 
 /* constants */
-#ifndef PROGNAME
-# define PROGNAME	"calendar"
+#ifndef PROGNAME_CALENDAR
+# define PROGNAME_CALENDAR	"calendar"
 #endif
 
 
@@ -52,7 +52,7 @@ static int _calendar(int embedded)
 	if(embedded != 0)
 		return _calendar_embedded();
 	if((calendar = calendarwindow_new()) == NULL)
-		return error_print(PACKAGE);
+		return error_print(PROGNAME_CALENDAR);
 	gtk_main();
 	calendarwindow_delete(calendar);
 	return 0;
@@ -96,7 +96,7 @@ static void _embedded_on_embedded(gpointer data)
 /* usage */
 static int _usage(void)
 {
-	fprintf(stderr, "Usage: %s -x\n", PROGNAME);
+	fprintf(stderr, _("Usage: %s -x\n"), PROGNAME_CALENDAR);
 	return 1;
 }
 

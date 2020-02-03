@@ -30,8 +30,8 @@
 #include "../config.h"
 
 /* constants */
-#ifndef PROGNAME
-# define PROGNAME		"calendar"
+#ifndef PROGNAME_CALENDAR
+# define PROGNAME_CALENDAR	"calendar"
 #endif
 
 /* macros */
@@ -385,7 +385,7 @@ static int _calendar_error(Calendar * calendar, char const * message, int ret)
 
 	if(calendar == NULL)
 	{
-		fputs(PROGNAME, stderr);
+		fputs(PROGNAME_CALENDAR, stderr);
 		perror(message);
 		return ret;
 	}
@@ -449,7 +449,7 @@ static int _open_parse(Calendar * calendar, char const * filename, FILE * fp)
 		if(ferror(fp))
 			return -_calendar_error(calendar, filename, 1);
 		/* FIXME report error */
-		fprintf(stderr, "%s: %s: %s\n", PROGNAME, filename,
+		fprintf(stderr, "%s: %s: %s\n", PROGNAME_CALENDAR, filename,
 				"Not a valid calendar");
 		return -1;
 	}

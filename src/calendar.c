@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /* TODO:
+ * - support multi-line in .calendar
  * - complete iCal support (and move it to the CalendarEvent class) */
 
 
